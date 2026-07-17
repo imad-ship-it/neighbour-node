@@ -10,12 +10,12 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 # App routers get included here as they land, e.g.:
-#   path("nodes/", include("nodes.urls")),
 #   path("items/", include("items.urls")),
 #   path("transactions/", include("transactions.urls")),
 #   path("chat/", include("chat.urls")),
 api_v1_patterns = [
     path("auth/", include("accounts.urls")),
+    path("nodes/", include("nodes.urls")),
 ]
 
 urlpatterns = [
