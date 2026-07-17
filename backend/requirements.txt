@@ -1,0 +1,9 @@
+django>=5,<6
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+drf-spectacular
+psycopg2-binary
+django-filter
+pillow
+python-dotenv
