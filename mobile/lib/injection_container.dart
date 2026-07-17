@@ -5,11 +5,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/api_client.dart';
 import 'core/network/session_manager.dart';
 import 'core/network/token_storage.dart';
+import 'features/auth/data/datasources/auth_remote_data_source.dart';
+import 'features/auth/data/repositories/auth_repository_impl.dart';
+import 'features/auth/domain/repositories/auth_repository.dart';
+import 'features/auth/domain/usecases/get_current_user.dart';
+import 'features/auth/domain/usecases/login_user.dart';
+import 'features/auth/domain/usecases/logout.dart';
+import 'features/auth/domain/usecases/register_user.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 final sl = GetIt.instance;
 
-/// Registers core singletons. Feature registrations (blocs, use cases,
-/// repositories, datasources) append here as each feature lands.
+/// Registers dependencies. Pattern per feature (auth is the reference):
+/// bloc = factory; use cases, repository, datasource = lazy singletons.
 Future<void> init() async {
   // External
   sl.registerLazySingleton(() => const FlutterSecureStorage());
@@ -20,4 +28,25 @@ Future<void> init() async {
   sl.registerLazySingleton(() => TokenStorage(sl()));
   sl.registerLazySingleton(() => SessionManager());
   sl.registerLazySingleton(() => ApiClient(tokenStorage: sl(), sessionManager: sl()));
+
+  // Feature: auth
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(client: sl<ApiClient>().dio, tokenStorage: sl()),
+  );
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => LoginUser(sl()));
+  sl.registerLazySingleton(() => RegisterUser(sl()));
+  sl.registerLazySingleton(() => GetCurrentUser(sl()));
+  sl.registerLazySingleton(() => Logout(sl()));
+  sl.registerFactory(
+    () => AuthBloc(
+      login: sl(),
+      register: sl(),
+      restoreSession: sl(),
+      signOut: sl(),
+      sessionManager: sl(),
+    ),
+  );
 }

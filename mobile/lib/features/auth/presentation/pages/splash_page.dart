@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Branded splash. For now it simply pauses, then moves on to /login;
-/// once the auth feature lands it will check stored tokens and route to
-/// /home for a live session instead.
+import '../bloc/auth_bloc.dart';
+
+/// Branded splash. Dispatches [AppStarted] once; the router's redirect takes
+/// over as soon as the session check resolves.
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -14,20 +13,10 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  Timer? _timer;
-
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(milliseconds: 1800), () {
-      if (mounted) context.go('/login');
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+    context.read<AuthBloc>().add(const AppStarted());
   }
 
   @override
@@ -89,6 +78,15 @@ class _SplashPageState extends State<SplashPage> {
                     color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 15,
                     letterSpacing: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 36),
+                const SizedBox(
+                  width: 26,
+                  height: 26,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    valueColor: AlwaysStoppedAnimation(Colors.white70),
                   ),
                 ),
               ],
