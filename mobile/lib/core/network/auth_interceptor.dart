@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 
 import '../constants/api_constants.dart';
 import 'session_manager.dart';
@@ -68,6 +69,11 @@ class AuthInterceptor extends QueuedInterceptor {
       return handler.next(err);
     }
 
+    if (kDebugMode) {
+      debugPrint(
+        '[AuthInterceptor] 401 on ${options.path} — refreshing access token',
+      );
+    }
     try {
       final response = await _refreshDio.post<Map<String, dynamic>>(
         ApiConstants.refresh,
@@ -84,6 +90,11 @@ class AuthInterceptor extends QueuedInterceptor {
       options.extra[_retriedFlag] = true;
       options.headers['Authorization'] = 'Bearer $newAccess';
       final retried = await _refreshDio.fetch<dynamic>(options);
+      if (kDebugMode) {
+        debugPrint(
+          '[AuthInterceptor] token refreshed, ${options.path} retried OK',
+        );
+      }
       return handler.resolve(retried);
     } on DioException catch (retryError) {
       if (retryError.requestOptions.path == ApiConstants.refresh) {
