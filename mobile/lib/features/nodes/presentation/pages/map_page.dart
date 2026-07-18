@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../../core/utils/location_service.dart';
 import '../../../../injection_container.dart';
@@ -16,8 +17,9 @@ import '../widgets/location_gate_view.dart';
 import '../widgets/node_sheet.dart';
 import '../widgets/nodes_style.dart';
 
-/// Authenticated home: Google Map centred on the user with a translucent
-/// 5 km radius circle and gold markers for nearby active Nodes.
+/// Authenticated home: an OpenStreetMap (flutter_map — no API key needed)
+/// centred on the user with a translucent 5 km radius circle and gold
+/// markers for nearby active Nodes.
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -36,7 +38,7 @@ class _MapPageState extends State<MapPage> {
 
   _Gate _gate = _Gate.checking;
   Position? _position;
-  GoogleMapController? _mapController;
+  final MapController _mapController = MapController();
 
   @override
   void initState() {
@@ -46,7 +48,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
-    _mapController?.dispose();
+    _mapController.dispose();
     _nodeBloc.close();
     super.dispose();
   }
@@ -97,11 +99,14 @@ class _MapPageState extends State<MapPage> {
       final position = await _location.getCurrentPosition();
       if (!mounted) return;
       setState(() => _position = position);
-      unawaited(_mapController?.animateCamera(
-        CameraUpdate.newLatLng(
+      try {
+        _mapController.move(
           LatLng(position.latitude, position.longitude),
-        ),
-      ));
+          _mapController.camera.zoom,
+        );
+      } catch (_) {
+        // Map not rendered yet — the new position still recentres it.
+      }
       unawaited(_location.syncLocationToBackend(position));
     } catch (_) {
       // Keep the previous position; still re-run the query.
@@ -150,7 +155,7 @@ class _MapPageState extends State<MapPage> {
           _Gate.ready => _MapView(
               position: _position!,
               radiusMeters: _radiusMeters,
-              onMapCreated: (controller) => _mapController = controller,
+              mapController: _mapController,
               onRetry: _loadNodes,
             ),
         },
@@ -267,13 +272,13 @@ class _MapView extends StatelessWidget {
   const _MapView({
     required this.position,
     required this.radiusMeters,
-    required this.onMapCreated,
+    required this.mapController,
     required this.onRetry,
   });
 
   final Position position;
   final double radiusMeters;
-  final void Function(GoogleMapController) onMapCreated;
+  final MapController mapController;
   final VoidCallback onRetry;
 
   @override
@@ -284,32 +289,58 @@ class _MapView extends StatelessWidget {
         final nodes = state is NodesLoaded ? state.nodes : const <NodeEntity>[];
         return Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(target: center, zoom: 13),
-              onMapCreated: onMapCreated,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              // Leave room for the refresh FAB + overlays.
-              padding: const EdgeInsets.only(bottom: 96),
-              circles: {
-                Circle(
-                  circleId: const CircleId('search-radius'),
-                  center: center,
-                  radius: radiusMeters,
-                  fillColor: kNodeGold.withValues(alpha: 0.07),
-                  strokeColor: kNodeGold.withValues(alpha: 0.45),
-                  strokeWidth: 1,
+            FlutterMap(
+              mapController: mapController,
+              options: MapOptions(
+                initialCenter: center,
+                initialZoom: 13,
+                maxZoom: 19,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.neighbornode.neighbor_node',
                 ),
-              },
-              markers: {
-                for (final node in nodes)
-                  Marker(
-                    markerId: MarkerId('node-${node.id}'),
-                    position: LatLng(node.lat, node.lng),
-                    icon: BitmapDescriptor.defaultMarkerWithHue(kNodeGoldHue),
-                    onTap: () => NodeSheet.show(context, node),
-                  ),
-              },
+                CircleLayer(
+                  circles: [
+                    CircleMarker(
+                      point: center,
+                      radius: radiusMeters,
+                      useRadiusInMeter: true,
+                      color: kNodeGold.withValues(alpha: 0.07),
+                      borderColor: kNodeGold.withValues(alpha: 0.45),
+                      borderStrokeWidth: 1,
+                    ),
+                  ],
+                ),
+                MarkerLayer(
+                  markers: [
+                    // My-location dot (flutter_map has no built-in one).
+                    Marker(
+                      point: center,
+                      width: 22,
+                      height: 22,
+                      child: const _MyLocationDot(),
+                    ),
+                    for (final node in nodes)
+                      Marker(
+                        point: LatLng(node.lat, node.lng),
+                        width: 46,
+                        height: 46,
+                        // Anchor the pin's tip at the coordinate.
+                        alignment: Alignment.topCenter,
+                        child: _NodeMarker(
+                          onTap: () => NodeSheet.show(context, node),
+                        ),
+                      ),
+                  ],
+                ),
+                const SimpleAttributionWidget(
+                  // OSM tile usage policy requires attribution.
+                  source: Text('OpenStreetMap contributors'),
+                  alignment: Alignment.bottomLeft,
+                ),
+              ],
             ),
             if (state is NodesLoading)
               const Positioned(
@@ -334,6 +365,47 @@ class _MapView extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Gold pin for a Node, tip anchored at the node's coordinate.
+class _NodeMarker extends StatelessWidget {
+  const _NodeMarker({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: const Icon(
+        Icons.location_pin,
+        size: 44,
+        color: kNodeGold,
+        shadows: [
+          Shadow(color: Colors.black38, blurRadius: 6, offset: Offset(0, 2)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Classic blue "you are here" dot.
+class _MyLocationDot extends StatelessWidget {
+  const _MyLocationDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF4285F4),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 3),
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 6),
+        ],
+      ),
     );
   }
 }

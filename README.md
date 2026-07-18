@@ -63,29 +63,18 @@ flutter test
 flutter run              # pick your device: emulator, Chrome, ...
 ```
 
-#### Google Maps API key (required for the map screen)
+#### The map (OpenStreetMap — no API key needed)
 
-The home screen is a Google Map, so Android needs a Maps API key:
+The home screen renders OpenStreetMap tiles via `flutter_map`, so there is
+**no API key, no billing account, and no per-platform setup**. Tiles come from
+the public OSM tile server (attribution is shown on the map; fine for
+development and small deployments per the
+[OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/) —
+point `TileLayer.urlTemplate` in `map_page.dart` at a provider like MapTiler
+or Stadia before any large-scale launch).
 
-1. In the [Google Cloud Console](https://console.cloud.google.com), enable
-   **Maps SDK for Android** (APIs & Services → Library), then create an API
-   key (→ Credentials). The project needs billing enabled, but native mobile
-   map loads sit well inside the free monthly quota. Restrict the key to
-   Android apps with package name `com.neighbornode.neighbor_node`.
-2. Paste it into `mobile/android/local.properties` (gitignored — the key is
-   injected into the manifest at build time and never committed):
-
-   ```properties
-   MAPS_API_KEY=AIza...
-   ```
-
-3. iOS builds only: also enable **Maps SDK for iOS** and replace
-   `YOUR_IOS_MAPS_API_KEY` in `mobile/ios/Runner/AppDelegate.swift`,
-   restricting that key to the bundle id.
-
-Without a key the app still runs, but map tiles render blank. On the
-emulator, set a mock location (⋮ → Location in extended controls) so the map
-has somewhere to centre.
+On the emulator, set a mock location (⋮ → Location in extended controls) so
+the map has somewhere to centre.
 
 The API host is picked automatically: `localhost:8000` on web/desktop,
 `10.0.2.2:8000` on the Android emulator. For a **physical device**, use your
