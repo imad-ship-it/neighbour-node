@@ -92,7 +92,9 @@ class NodeSheet extends StatelessWidget {
             FilledButton.icon(
               onPressed: () {
                 Navigator.of(context).pop();
-                context.push('/nodes/${node.id}');
+                // extra carries the marker entity so the detail page can show
+                // the distance (the detail endpoint doesn't return one).
+                context.push('/nodes/${node.id}', extra: node);
               },
               icon: const Icon(Icons.warehouse_outlined),
               label: const Text('View Node'),

@@ -18,7 +18,11 @@ import 'features/nodes/data/datasources/nodes_remote_data_source.dart';
 import 'features/nodes/data/repositories/nodes_repository_impl.dart';
 import 'features/nodes/domain/repositories/nodes_repository.dart';
 import 'features/nodes/domain/usecases/get_nearby_nodes.dart';
+import 'features/nodes/domain/usecases/get_node_detail.dart';
+import 'features/nodes/domain/usecases/register_node.dart';
 import 'features/nodes/presentation/bloc/node_bloc.dart';
+import 'features/nodes/presentation/bloc/node_detail_bloc.dart';
+import 'features/nodes/presentation/bloc/register_node_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -62,8 +66,12 @@ Future<void> init() async {
     () => NodesRemoteDataSourceImpl(client: sl<ApiClient>().dio),
   );
   sl.registerLazySingleton<NodesRepository>(
-    () => NodesRepositoryImpl(sl()),
+    () => NodesRepositoryImpl(sl(), sl()),
   );
   sl.registerLazySingleton(() => GetNearbyNodes(sl()));
+  sl.registerLazySingleton(() => GetNodeDetail(sl()));
+  sl.registerLazySingleton(() => RegisterNode(sl()));
   sl.registerFactory(() => NodeBloc(nearbyNodes: sl()));
+  sl.registerFactory(() => NodeDetailBloc(nodeDetail: sl()));
+  sl.registerFactory(() => RegisterNodeBloc(submitNode: sl()));
 }

@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../core/utils/location_service.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/node_entity.dart';
+import '../../domain/repositories/nodes_repository.dart';
 import '../bloc/node_bloc.dart';
 import '../widgets/location_gate_view.dart';
 import '../widgets/node_sheet.dart';
@@ -112,17 +114,8 @@ class _MapPageState extends State<MapPage> {
     return BlocProvider.value(
       value: _nodeBloc,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Nearby Nodes'),
-          actions: [
-            IconButton(
-              tooltip: 'Log out',
-              icon: const Icon(Icons.logout),
-              onPressed: () =>
-                  context.read<AuthBloc>().add(const LogoutRequested()),
-            ),
-          ],
-        ),
+        appBar: AppBar(title: const Text('Nearby Nodes')),
+        drawer: const _MapDrawer(),
         body: switch (_gate) {
           _Gate.checking => const Center(child: CircularProgressIndicator()),
           _Gate.denied => LocationGateView(
@@ -168,6 +161,103 @@ class _MapPageState extends State<MapPage> {
                 child: const Icon(Icons.refresh),
               )
             : null,
+      ),
+    );
+  }
+}
+
+/// App menu: profile header, node-manager entry ("Become a Node Manager" or
+/// "My Node" once the role flips), and logout.
+class _MapDrawer extends StatelessWidget {
+  const _MapDrawer();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final authState = context.watch<AuthBloc>().state;
+    final user = authState is Authenticated ? authState.user : null;
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 26,
+                    backgroundColor: scheme.primaryContainer,
+                    child: Icon(Icons.person_outline,
+                        color: scheme.onPrimaryContainer),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.displayName ?? 'Neighbour',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        if (user != null)
+                          Text(
+                            user.email,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            if (user != null && user.isNodeManager)
+              FutureBuilder<int?>(
+                future: sl<NodesRepository>().getManagedNodeId(),
+                builder: (context, snapshot) {
+                  final nodeId = snapshot.data;
+                  if (nodeId == null) return const SizedBox.shrink();
+                  return ListTile(
+                    leading: const Icon(Icons.warehouse_outlined),
+                    title: const Text('My Node'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push('/nodes/$nodeId');
+                    },
+                  );
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.add_business_outlined),
+                title: const Text('Become a Node Manager'),
+                subtitle: const Text('Register a community storeroom'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  context.push('/nodes/register');
+                },
+              ),
+            const Spacer(),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Log out'),
+              onTap: () =>
+                  context.read<AuthBloc>().add(const LogoutRequested()),
+            ),
+          ],
+        ),
       ),
     );
   }
