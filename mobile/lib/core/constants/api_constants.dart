@@ -28,4 +28,8 @@ class ApiConstants {
   static const String refresh = '/auth/refresh/';
   static const String verifyPhone = '/auth/verify-phone/';
   static const String me = '/auth/me/';
+
+  // Nodes (MASTER_PLAN §5)
+  static const String nodes = '/nodes/';
+  static const String nodesNearby = '/nodes/nearby/';
 }

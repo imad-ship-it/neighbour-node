@@ -5,7 +5,8 @@ import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/pages/splash_page.dart';
-import 'features/dashboard/presentation/pages/home_page.dart';
+import 'features/nodes/presentation/pages/map_page.dart';
+import 'features/nodes/presentation/pages/node_detail_page.dart';
 
 /// Auth-aware router. `refreshListenable` re-runs `redirect` on every
 /// AuthBloc state change, so navigation follows auth state automatically:
@@ -32,7 +33,14 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),
-      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      // Authenticated home: the map of nearby Nodes (MASTER_PLAN Phase 2).
+      GoRoute(path: '/home', builder: (context, state) => const MapPage()),
+      GoRoute(
+        path: '/nodes/:id',
+        builder: (context, state) => NodeDetailPage(
+          nodeId: int.parse(state.pathParameters['id']!),
+        ),
+      ),
     ],
   );
 }

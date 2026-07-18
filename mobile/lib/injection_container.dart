@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/api_client.dart';
 import 'core/network/session_manager.dart';
 import 'core/network/token_storage.dart';
+import 'core/utils/location_service.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
@@ -13,6 +14,11 @@ import 'features/auth/domain/usecases/login_user.dart';
 import 'features/auth/domain/usecases/logout.dart';
 import 'features/auth/domain/usecases/register_user.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/nodes/data/datasources/nodes_remote_data_source.dart';
+import 'features/nodes/data/repositories/nodes_repository_impl.dart';
+import 'features/nodes/domain/repositories/nodes_repository.dart';
+import 'features/nodes/domain/usecases/get_nearby_nodes.dart';
+import 'features/nodes/presentation/bloc/node_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -28,6 +34,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => TokenStorage(sl()));
   sl.registerLazySingleton(() => SessionManager());
   sl.registerLazySingleton(() => ApiClient(tokenStorage: sl(), sessionManager: sl()));
+  sl.registerLazySingleton(() => LocationService(client: sl<ApiClient>().dio));
 
   // Feature: auth
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -49,4 +56,14 @@ Future<void> init() async {
       sessionManager: sl(),
     ),
   );
+
+  // Feature: nodes
+  sl.registerLazySingleton<NodesRemoteDataSource>(
+    () => NodesRemoteDataSourceImpl(client: sl<ApiClient>().dio),
+  );
+  sl.registerLazySingleton<NodesRepository>(
+    () => NodesRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => GetNearbyNodes(sl()));
+  sl.registerFactory(() => NodeBloc(nearbyNodes: sl()));
 }
