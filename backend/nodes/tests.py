@@ -138,6 +138,16 @@ class NearbyApiTests(APITestCase):
         names = [node["name"] for node in response.data]
         self.assertEqual(names, ["Nearest Node"])
 
+    def test_node_exactly_on_radius_boundary_is_included(self):
+        from common.geo import haversine_m
+
+        boundary = haversine_m(
+            QUERY_LAT, QUERY_LNG, self.near.latitude, self.near.longitude
+        )
+        response = self._get(radius=boundary)
+        names = [node["name"] for node in response.data]
+        self.assertIn("Near Node", names)  # distance <= radius, not <
+
     def test_payload_shape(self):
         node = self._get().data[0]
         self.assertEqual(
@@ -262,6 +272,21 @@ class NodeDetailApiTests(APITestCase):
         self.assertEqual(
             response.data["location"], {"lat": QUERY_LAT, "lng": QUERY_LNG}
         )
+
+    def test_detail_with_all_days_closed_reports_not_open(self):
+        all_closed = {day: "closed" for day in OPEN_ALL_WEEK}
+        closed_node = make_node(
+            self.manager,
+            QUERY_LAT,
+            QUERY_LNG,
+            name="Always Closed",
+            operating_hours=all_closed,
+        )
+        self.client.force_authenticate(self.other)
+        response = self.client.get(f"{NODES_URL}{closed_node.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["is_open_now"])
+        self.assertEqual(response.data["operating_hours"], all_closed)
 
     def test_patch_by_manager(self):
         self.client.force_authenticate(self.manager)
