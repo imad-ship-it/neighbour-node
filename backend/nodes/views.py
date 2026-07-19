@@ -45,7 +45,7 @@ class NodeViewSet(
 
     def get_permissions(self):
         permissions = super().get_permissions()
-        if self.action == "partial_update":
+        if self.action in ("partial_update", "pending_donations"):
             permissions.append(IsNodeManager())
         return permissions
 
@@ -117,12 +117,43 @@ class NodeViewSet(
         return Response(serializer.data)
 
     @extend_schema(
-        responses={200: OpenApiResponse(description="List of items (empty until Phase 3)")}
+        responses=OpenApiResponse(description="ACTIVE + available items at this node")
     )
     @action(detail=True)
     def inventory(self, request, pk=None):
         """GET /nodes/{id}/inventory/ — ACTIVE + available items at this node."""
-        self.get_object()  # 404 for unknown nodes
-        # TODO(Phase 3): return this node's ACTIVE + available items once the
-        # items app lands (MASTER_PLAN §5 / §6 Phase 3).
-        return Response([])
+        from items.models import Item
+        from items.serializers import ItemListSerializer
+
+        node = self.get_object()
+        items = (
+            node.items.filter(
+                listing_status=Item.ListingStatus.ACTIVE, is_available=True
+            )
+            .select_related("owner")
+            .prefetch_related("images")
+        )
+        serializer = ItemListSerializer(
+            items, many=True, context=self.get_serializer_context()
+        )
+        return Response(serializer.data)
+
+    @extend_schema(
+        responses=OpenApiResponse(description="This node's donation queue")
+    )
+    @action(detail=True, url_path="pending-donations")
+    def pending_donations(self, request, pk=None):
+        """GET /nodes/{id}/pending-donations/ — manager of this node only."""
+        from items.models import Item
+        from items.serializers import ItemListSerializer
+
+        node = self.get_object()  # IsNodeManager object check runs here
+        items = (
+            node.items.filter(listing_status=Item.ListingStatus.PENDING_DONATION)
+            .select_related("owner")
+            .prefetch_related("images")
+        )
+        serializer = ItemListSerializer(
+            items, many=True, context=self.get_serializer_context()
+        )
+        return Response(serializer.data)
