@@ -169,6 +169,9 @@ class DonationFlowTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.item.refresh_from_db()
         self.assertEqual(self.item.listing_status, Item.ListingStatus.REJECTED)
+        # A rejected item must never surface in the node's inventory.
+        inventory = self.client.get(f"/api/v1/nodes/{self.node.id}/inventory/")
+        self.assertEqual(inventory.data, [])
 
     def test_owner_and_stranger_cannot_review(self):
         for user in (self.owner, self.stranger):
@@ -233,6 +236,12 @@ class NearbyItemsApiTests(APITestCase):
             listing_status=Item.ListingStatus.PENDING_DONATION,
             title="Pending item",
         )
+        make_item(
+            self.owner,
+            node=self.node,
+            listing_status=Item.ListingStatus.REJECTED,
+            title="Rejected item",
+        )
         make_item(self.owner, is_available=False, title="Rented out")
 
     def _get(self, **params):
@@ -252,6 +261,7 @@ class NearbyItemsApiTests(APITestCase):
         self.assertEqual(titles[0], "DeWalt Power Drill")
         self.assertNotIn("Far item", titles)
         self.assertNotIn("Pending item", titles)
+        self.assertNotIn("Rejected item", titles)
         self.assertNotIn("Rented out", titles)
         distances = [item["distance"] for item in response.data]
         self.assertEqual(distances, sorted(distances))
