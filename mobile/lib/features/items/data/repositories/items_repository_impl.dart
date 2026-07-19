@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/errors/error_mapper.dart';
 import '../../../../core/errors/failures.dart';
+import '../../domain/entities/item_detail_entity.dart';
 import '../../domain/entities/item_entity.dart';
 import '../../domain/repositories/items_repository.dart';
 import '../datasources/items_remote_data_source.dart';
@@ -11,6 +12,10 @@ class ItemsRepositoryImpl implements ItemsRepository {
   const ItemsRepositoryImpl(this._remote);
 
   final ItemsRemoteDataSource _remote;
+
+  @override
+  Future<Either<Failure, ItemDetailEntity>> getItem(int id) =>
+      _guard(() async => (await _remote.getItem(id)).toEntity());
 
   @override
   Future<Either<Failure, ItemEntity>> createItem({

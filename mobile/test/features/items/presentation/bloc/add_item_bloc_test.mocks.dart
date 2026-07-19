@@ -8,8 +8,10 @@ import 'dart:async' as _i4;
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:neighbor_node/core/errors/failures.dart' as _i5;
-import 'package:neighbor_node/features/items/domain/entities/item_entity.dart'
+import 'package:neighbor_node/features/items/domain/entities/item_detail_entity.dart'
     as _i6;
+import 'package:neighbor_node/features/items/domain/entities/item_entity.dart'
+    as _i7;
 import 'package:neighbor_node/features/items/domain/repositories/items_repository.dart'
     as _i3;
 
@@ -38,7 +40,28 @@ class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
 /// See the documentation for Mockito's code generation for more information.
 class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>> createItem({
+  _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>> getItem(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#getItem, [id]),
+            returnValue:
+                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i6.ItemDetailEntity>(
+                    this,
+                    Invocation.method(#getItem, [id]),
+                  ),
+                ),
+            returnValueForMissingStub:
+                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i6.ItemDetailEntity>(
+                    this,
+                    Invocation.method(#getItem, [id]),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>> createItem({
     required String? title,
     required String? description,
     required String? category,
@@ -60,8 +83,8 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
               #imagePaths: imagePaths,
             }),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.ItemEntity>(
+                _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i7.ItemEntity>(
                     this,
                     Invocation.method(#createItem, [], {
                       #title: title,
@@ -76,8 +99,8 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                   ),
                 ),
             returnValueForMissingStub:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.ItemEntity>(
+                _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i7.ItemEntity>(
                     this,
                     Invocation.method(#createItem, [], {
                       #title: title,
@@ -92,10 +115,10 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>>);
+          as _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>> getNearbyItems({
+  _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>> getNearbyItems({
     required double? lat,
     required double? lng,
     double? radiusMeters,
@@ -113,8 +136,8 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
               #storageType: storageType,
             }),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.ItemEntity>>(
+                _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i7.ItemEntity>>(
                     this,
                     Invocation.method(#getNearbyItems, [], {
                       #lat: lat,
@@ -127,8 +150,8 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                   ),
                 ),
             returnValueForMissingStub:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.ItemEntity>>(
+                _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i7.ItemEntity>>(
                     this,
                     Invocation.method(#getNearbyItems, [], {
                       #lat: lat,
@@ -141,54 +164,54 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>);
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>> getMyItems() =>
+  _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>> getMyItems() =>
       (super.noSuchMethod(
             Invocation.method(#getMyItems, []),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.ItemEntity>>(
+                _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i7.ItemEntity>>(
                     this,
                     Invocation.method(#getMyItems, []),
                   ),
                 ),
             returnValueForMissingStub:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.ItemEntity>>(
+                _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i7.ItemEntity>>(
                     this,
                     Invocation.method(#getMyItems, []),
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>);
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>> getNodeInventory(
+  _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>> getNodeInventory(
     int? nodeId,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#getNodeInventory, [nodeId]),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.ItemEntity>>(
+                _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i7.ItemEntity>>(
                     this,
                     Invocation.method(#getNodeInventory, [nodeId]),
                   ),
                 ),
             returnValueForMissingStub:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.ItemEntity>>(
+                _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i7.ItemEntity>>(
                     this,
                     Invocation.method(#getNodeInventory, [nodeId]),
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemEntity>>>);
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i7.ItemEntity>>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>> setItemAvailability({
+  _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>> setItemAvailability({
     required int? itemId,
     required bool? isAvailable,
   }) =>
@@ -198,8 +221,8 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
               #isAvailable: isAvailable,
             }),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.ItemEntity>(
+                _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i7.ItemEntity>(
                     this,
                     Invocation.method(#setItemAvailability, [], {
                       #itemId: itemId,
@@ -208,8 +231,8 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                   ),
                 ),
             returnValueForMissingStub:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.ItemEntity>(
+                _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i7.ItemEntity>(
                     this,
                     Invocation.method(#setItemAvailability, [], {
                       #itemId: itemId,
@@ -218,5 +241,5 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i6.ItemEntity>>);
+          as _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>);
 }

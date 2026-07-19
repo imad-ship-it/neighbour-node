@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../injection_container.dart';
+import '../../../items/presentation/widgets/node_inventory_grid.dart';
 import '../../domain/entities/node_detail_entity.dart';
 import '../../domain/entities/node_entity.dart';
 import '../bloc/node_detail_bloc.dart';
@@ -139,10 +140,7 @@ class _DetailView extends StatelessWidget {
                 const SizedBox(height: 24),
                 _SectionTitle('Inventory'),
                 const SizedBox(height: 8),
-                _StubCard(
-                  icon: Icons.inventory_2_outlined,
-                  message: 'Browsing this Node\'s items is coming in Phase 3.',
-                ),
+                NodeInventoryGrid(nodeId: node.id),
                 const SizedBox(height: 24),
                 _SectionTitle('Manager'),
                 const SizedBox(height: 8),
@@ -389,39 +387,6 @@ class _HoursTable extends StatelessWidget {
   static String _formatHours(String? value) {
     if (_isClosed(value)) return 'Closed';
     return value!.replaceFirst('-', ' – ');
-  }
-}
-
-class _StubCard extends StatelessWidget {
-  const _StubCard({required this.icon, required this.message});
-
-  final IconData icon;
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(icon, color: scheme.onSurfaceVariant),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 

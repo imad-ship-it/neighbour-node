@@ -1,10 +1,14 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
+import '../entities/item_detail_entity.dart';
 import '../entities/item_entity.dart';
 
 /// Contract implemented by the data layer (mirrors NodesRepository).
 abstract class ItemsRepository {
+  /// Full detail for one item (any authenticated user).
+  Future<Either<Failure, ItemDetailEntity>> getItem(int id);
+
   /// POST /items/ multipart. `nodeId` set → donation (PENDING_DONATION);
   /// null → personal item, live immediately. Rates travel as strings so the
   /// backend's DecimalField gets exact values.

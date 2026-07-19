@@ -18,12 +18,16 @@ import 'features/items/data/datasources/items_remote_data_source.dart';
 import 'features/items/data/repositories/items_repository_impl.dart';
 import 'features/items/domain/repositories/items_repository.dart';
 import 'features/items/domain/usecases/create_item.dart';
+import 'features/items/domain/usecases/get_item_detail.dart';
 import 'features/items/domain/usecases/get_my_items.dart';
 import 'features/items/domain/usecases/get_nearby_items.dart';
 import 'features/items/domain/usecases/get_node_inventory.dart';
 import 'features/items/domain/usecases/set_item_availability.dart';
 import 'features/items/presentation/bloc/add_item_bloc.dart';
+import 'features/items/presentation/bloc/item_detail_bloc.dart';
+import 'features/items/presentation/bloc/items_bloc.dart';
 import 'features/items/presentation/bloc/my_items_bloc.dart';
+import 'features/items/presentation/bloc/node_inventory_bloc.dart';
 import 'features/nodes/data/datasources/nodes_remote_data_source.dart';
 import 'features/nodes/data/repositories/nodes_repository_impl.dart';
 import 'features/nodes/domain/repositories/nodes_repository.dart';
@@ -96,9 +100,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetNearbyItems(sl()));
   sl.registerLazySingleton(() => GetMyItems(sl()));
   sl.registerLazySingleton(() => GetNodeInventory(sl()));
+  sl.registerLazySingleton(() => GetItemDetail(sl()));
   sl.registerLazySingleton(() => SetItemAvailability(sl()));
   sl.registerFactory(() => AddItemBloc(submitItem: sl()));
   sl.registerFactory(
     () => MyItemsBloc(myItems: sl(), toggleAvailability: sl()),
   );
+  sl.registerFactory(() => ItemsBloc(nearbyItems: sl()));
+  sl.registerFactory(() => ItemDetailBloc(itemDetail: sl()));
+  sl.registerFactory(() => NodeInventoryBloc(inventory: sl()));
 }

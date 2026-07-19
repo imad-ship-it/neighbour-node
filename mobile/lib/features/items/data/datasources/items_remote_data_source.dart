@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
+import '../models/item_detail_model.dart';
 import '../models/item_model.dart';
 
 /// Talks HTTP. Throws [DioException] upward — the repository translates
 /// those into [Failure]s (same contract as auth/nodes).
 abstract class ItemsRemoteDataSource {
+  Future<ItemDetailModel> getItem(int id);
+
   Future<ItemModel> createItem({
     required String title,
     required String description,
@@ -44,6 +47,13 @@ class ItemsRemoteDataSourceImpl implements ItemsRemoteDataSource {
   List<ItemModel> _parseList(List<dynamic>? data) => (data ?? const [])
       .map((json) => ItemModel.fromJson(json as Map<String, dynamic>))
       .toList();
+
+  @override
+  Future<ItemDetailModel> getItem(int id) async {
+    final response =
+        await _dio.get<Map<String, dynamic>>('${ApiConstants.items}$id/');
+    return ItemDetailModel.fromJson(response.data!);
+  }
 
   @override
   Future<ItemModel> createItem({

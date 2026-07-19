@@ -5,12 +5,15 @@ import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/pages/splash_page.dart';
+import 'features/items/domain/entities/item_entity.dart';
 import 'features/items/presentation/pages/add_item_page.dart';
+import 'features/items/presentation/pages/item_detail_page.dart';
 import 'features/items/presentation/pages/my_items_page.dart';
 import 'features/nodes/domain/entities/node_entity.dart';
 import 'features/nodes/presentation/pages/map_page.dart';
 import 'features/nodes/presentation/pages/node_detail_page.dart';
 import 'features/nodes/presentation/pages/register_node_page.dart';
+import 'features/transactions/presentation/pages/transactions_stub_page.dart';
 
 /// Auth-aware router. `refreshListenable` re-runs `redirect` on every
 /// AuthBloc state change, so navigation follows auth state automatically:
@@ -46,6 +49,18 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(
         path: '/items/my',
         builder: (context, state) => const MyItemsPage(),
+      ),
+      GoRoute(
+        path: '/items/:id',
+        builder: (context, state) => ItemDetailPage(
+          itemId: int.parse(state.pathParameters['id']!),
+          initial: state.extra is ItemEntity ? state.extra as ItemEntity : null,
+        ),
+      ),
+      // Phase-4 stub behind "Request to Rent".
+      GoRoute(
+        path: '/rent-coming-soon',
+        builder: (context, state) => const TransactionsStubPage(),
       ),
       // Static segment must precede '/nodes/:id' so "register" isn't an id.
       GoRoute(
