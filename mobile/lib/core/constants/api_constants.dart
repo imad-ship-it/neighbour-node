@@ -32,4 +32,11 @@ class ApiConstants {
   // Nodes (MASTER_PLAN §5)
   static const String nodes = '/nodes/';
   static const String nodesNearby = '/nodes/nearby/';
+
+  // Items (MASTER_PLAN §5)
+  static const String items = '/items/';
+  static const String itemsNearby = '/items/nearby/';
+  static const String itemsMy = '/items/my/';
+
+  static String nodeInventory(int nodeId) => '/nodes/$nodeId/inventory/';
 }

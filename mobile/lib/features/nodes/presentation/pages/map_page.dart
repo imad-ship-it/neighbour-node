@@ -157,15 +157,20 @@ class _MapPageState extends State<MapPage> {
               radiusMeters: _radiusMeters,
               mapController: _mapController,
               onRetry: _loadNodes,
+              onRefresh: _refresh,
             ),
         },
+        // Phase 3: listing an item is the app's core action — centre stage.
         floatingActionButton: _gate == _Gate.ready
-            ? FloatingActionButton(
-                tooltip: 'Refresh nearby nodes',
-                onPressed: _refresh,
-                child: const Icon(Icons.refresh),
+            ? FloatingActionButton.extended(
+                heroTag: 'add-item',
+                onPressed: () => context.push('/items/add'),
+                icon: const Icon(Icons.add),
+                label: const Text('Add item'),
               )
             : null,
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
@@ -253,6 +258,14 @@ class _MapDrawer extends StatelessWidget {
                   context.push('/nodes/register');
                 },
               ),
+            ListTile(
+              leading: const Icon(Icons.inventory_2_outlined),
+              title: const Text('My items'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.push('/items/my');
+              },
+            ),
             const Spacer(),
             const Divider(height: 1),
             ListTile(
@@ -274,12 +287,14 @@ class _MapView extends StatelessWidget {
     required this.radiusMeters,
     required this.mapController,
     required this.onRetry,
+    required this.onRefresh,
   });
 
   final Position position;
   final double radiusMeters;
   final MapController mapController;
   final VoidCallback onRetry;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -341,6 +356,16 @@ class _MapView extends StatelessWidget {
                   alignment: Alignment.bottomLeft,
                 ),
               ],
+            ),
+            Positioned(
+              right: 16,
+              bottom: 24,
+              child: FloatingActionButton.small(
+                heroTag: 'refresh-nodes',
+                tooltip: 'Refresh nearby nodes',
+                onPressed: onRefresh,
+                child: const Icon(Icons.refresh),
+              ),
             ),
             if (state is NodesLoading)
               const Positioned(
