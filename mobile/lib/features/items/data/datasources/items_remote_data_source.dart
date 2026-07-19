@@ -37,6 +37,13 @@ abstract class ItemsRemoteDataSource {
     required int itemId,
     required bool isAvailable,
   });
+
+  Future<List<ItemDetailModel>> getPendingDonations(int nodeId);
+
+  Future<ItemDetailModel> reviewDonation({
+    required int itemId,
+    required bool accept,
+  });
 }
 
 class ItemsRemoteDataSourceImpl implements ItemsRemoteDataSource {
@@ -129,5 +136,26 @@ class ItemsRemoteDataSourceImpl implements ItemsRemoteDataSource {
       data: {'is_available': isAvailable},
     );
     return ItemModel.fromJson(response.data!);
+  }
+
+  @override
+  Future<List<ItemDetailModel>> getPendingDonations(int nodeId) async {
+    final response = await _dio
+        .get<List<dynamic>>(ApiConstants.nodePendingDonations(nodeId));
+    return (response.data ?? const [])
+        .map((json) => ItemDetailModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<ItemDetailModel> reviewDonation({
+    required int itemId,
+    required bool accept,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiConstants.itemReviewDonation(itemId),
+      data: {'action': accept ? 'accept' : 'reject'},
+    );
+    return ItemDetailModel.fromJson(response.data!);
   }
 }

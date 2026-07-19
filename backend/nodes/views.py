@@ -143,9 +143,13 @@ class NodeViewSet(
     )
     @action(detail=True, url_path="pending-donations")
     def pending_donations(self, request, pk=None):
-        """GET /nodes/{id}/pending-donations/ — manager of this node only."""
+        """GET /nodes/{id}/pending-donations/ — manager of this node only.
+
+        Detail serializer on purpose: the review UI needs the donor's
+        public profile and full images, not just the list card fields.
+        """
         from items.models import Item
-        from items.serializers import ItemListSerializer
+        from items.serializers import ItemDetailSerializer
 
         node = self.get_object()  # IsNodeManager object check runs here
         items = (
@@ -153,7 +157,7 @@ class NodeViewSet(
             .select_related("owner")
             .prefetch_related("images")
         )
-        serializer = ItemListSerializer(
+        serializer = ItemDetailSerializer(
             items, many=True, context=self.get_serializer_context()
         )
         return Response(serializer.data)

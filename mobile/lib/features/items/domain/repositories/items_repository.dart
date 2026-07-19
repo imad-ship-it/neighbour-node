@@ -45,4 +45,16 @@ abstract class ItemsRepository {
     required int itemId,
     required bool isAvailable,
   });
+
+  /// A node's PENDING_DONATION items (that node's manager only). Detail
+  /// entities: the review UI shows the donor's profile and photos.
+  Future<Either<Failure, List<ItemDetailEntity>>> getPendingDonations(
+    int nodeId,
+  );
+
+  /// Accept (→ ACTIVE) or reject (→ REJECTED) a pending donation.
+  Future<Either<Failure, ItemDetailEntity>> reviewDonation({
+    required int itemId,
+    required bool accept,
+  });
 }

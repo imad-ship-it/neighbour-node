@@ -195,6 +195,8 @@ class DonationFlowTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([item["id"] for item in response.data], [self.item.id])
+        # Detail payload: the review UI shows who is donating.
+        self.assertEqual(response.data[0]["owner"]["id"], self.owner.id)
 
         self.client.force_authenticate(self.stranger)
         self.assertEqual(

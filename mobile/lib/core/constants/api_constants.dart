@@ -39,4 +39,10 @@ class ApiConstants {
   static const String itemsMy = '/items/my/';
 
   static String nodeInventory(int nodeId) => '/nodes/$nodeId/inventory/';
+
+  static String nodePendingDonations(int nodeId) =>
+      '/nodes/$nodeId/pending-donations/';
+
+  static String itemReviewDonation(int itemId) =>
+      '/items/$itemId/review-donation/';
 }

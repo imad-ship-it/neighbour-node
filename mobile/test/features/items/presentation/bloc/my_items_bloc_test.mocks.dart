@@ -242,4 +242,63 @@ class MockItemsRepository extends _i1.Mock implements _i3.ItemsRepository {
                 ),
           )
           as _i4.Future<_i2.Either<_i5.Failure, _i7.ItemEntity>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemDetailEntity>>>
+  getPendingDonations(int? nodeId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getPendingDonations, [nodeId]),
+            returnValue:
+                _i4.Future<
+                  _i2.Either<_i5.Failure, List<_i6.ItemDetailEntity>>
+                >.value(
+                  _FakeEither_0<_i5.Failure, List<_i6.ItemDetailEntity>>(
+                    this,
+                    Invocation.method(#getPendingDonations, [nodeId]),
+                  ),
+                ),
+            returnValueForMissingStub:
+                _i4.Future<
+                  _i2.Either<_i5.Failure, List<_i6.ItemDetailEntity>>
+                >.value(
+                  _FakeEither_0<_i5.Failure, List<_i6.ItemDetailEntity>>(
+                    this,
+                    Invocation.method(#getPendingDonations, [nodeId]),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i6.ItemDetailEntity>>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>> reviewDonation({
+    required int? itemId,
+    required bool? accept,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#reviewDonation, [], {
+              #itemId: itemId,
+              #accept: accept,
+            }),
+            returnValue:
+                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i6.ItemDetailEntity>(
+                    this,
+                    Invocation.method(#reviewDonation, [], {
+                      #itemId: itemId,
+                      #accept: accept,
+                    }),
+                  ),
+                ),
+            returnValueForMissingStub:
+                _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>>.value(
+                  _FakeEither_0<_i5.Failure, _i6.ItemDetailEntity>(
+                    this,
+                    Invocation.method(#reviewDonation, [], {
+                      #itemId: itemId,
+                      #accept: accept,
+                    }),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i6.ItemDetailEntity>>);
 }

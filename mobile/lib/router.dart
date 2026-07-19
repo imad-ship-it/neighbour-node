@@ -10,7 +10,7 @@ import 'features/items/presentation/pages/add_item_page.dart';
 import 'features/items/presentation/pages/item_detail_page.dart';
 import 'features/items/presentation/pages/my_items_page.dart';
 import 'features/nodes/domain/entities/node_entity.dart';
-import 'features/nodes/presentation/pages/map_page.dart';
+import 'features/dashboard/presentation/pages/home_shell.dart';
 import 'features/nodes/presentation/pages/node_detail_page.dart';
 import 'features/nodes/presentation/pages/register_node_page.dart';
 import 'features/transactions/presentation/pages/transactions_stub_page.dart';
@@ -40,8 +40,8 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),
-      // Authenticated home: the map of nearby Nodes (MASTER_PLAN Phase 2).
-      GoRoute(path: '/home', builder: (context, state) => const MapPage()),
+      // Authenticated home: map, plus a Manage tab for Node Managers.
+      GoRoute(path: '/home', builder: (context, state) => const HomeShell()),
       GoRoute(
         path: '/items/add',
         builder: (context, state) => const AddItemPage(),

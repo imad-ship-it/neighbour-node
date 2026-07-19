@@ -22,8 +22,11 @@ import 'features/items/domain/usecases/get_item_detail.dart';
 import 'features/items/domain/usecases/get_my_items.dart';
 import 'features/items/domain/usecases/get_nearby_items.dart';
 import 'features/items/domain/usecases/get_node_inventory.dart';
+import 'features/items/domain/usecases/get_pending_donations.dart';
+import 'features/items/domain/usecases/review_donation.dart';
 import 'features/items/domain/usecases/set_item_availability.dart';
 import 'features/items/presentation/bloc/add_item_bloc.dart';
+import 'features/items/presentation/bloc/donation_queue_bloc.dart';
 import 'features/items/presentation/bloc/item_detail_bloc.dart';
 import 'features/items/presentation/bloc/items_bloc.dart';
 import 'features/items/presentation/bloc/my_items_bloc.dart';
@@ -109,4 +112,13 @@ Future<void> init() async {
   sl.registerFactory(() => ItemsBloc(nearbyItems: sl()));
   sl.registerFactory(() => ItemDetailBloc(itemDetail: sl()));
   sl.registerFactory(() => NodeInventoryBloc(inventory: sl()));
+  sl.registerLazySingleton(() => GetPendingDonations(sl()));
+  sl.registerLazySingleton(() => ReviewDonation(sl()));
+  sl.registerFactory(
+    () => DonationQueueBloc(
+      pendingDonations: sl(),
+      review: sl(),
+      nodesRepo: sl(),
+    ),
+  );
 }

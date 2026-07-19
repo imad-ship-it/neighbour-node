@@ -89,6 +89,26 @@ class ItemsRepositoryImpl implements ItemsRepository {
         return item.toEntity();
       });
 
+  @override
+  Future<Either<Failure, List<ItemDetailEntity>>> getPendingDonations(
+    int nodeId,
+  ) =>
+      _guard(() async {
+        final items = await _remote.getPendingDonations(nodeId);
+        return items.map((item) => item.toEntity()).toList();
+      });
+
+  @override
+  Future<Either<Failure, ItemDetailEntity>> reviewDonation({
+    required int itemId,
+    required bool accept,
+  }) =>
+      _guard(() async {
+        final item =
+            await _remote.reviewDonation(itemId: itemId, accept: accept);
+        return item.toEntity();
+      });
+
   Future<Either<Failure, T>> _guard<T>(Future<T> Function() run) async {
     try {
       return Right(await run());
